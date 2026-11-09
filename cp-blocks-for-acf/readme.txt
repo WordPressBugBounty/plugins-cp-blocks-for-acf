@@ -2,8 +2,8 @@
 Contributors: tekod
 Tags: acf, flexible, layout, copy, paste
 Requires at least: 6.0
-Tested up to: 6.8
-Stable tag: 0.4.2
+Tested up to: 7.1
+Stable tag: 0.4.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -36,7 +36,7 @@ This is often required when moving blocks from a staging to a live environment t
 ==Limitations==
 This will not transfer media or posts.
 Coping fields that use ID-s to refer to a content (such as: media images, links, relationship...) to another website may link the wrong resource to the field because posts/media on another site may have different ID-s.
-In this case you must manually edit such fields and connect appropriate media/posts.
+In this case you must manually correct such fields after pasting and connect appropriate media/posts.
 
 Only built-in field types are supported and tested.
 Additional (extended) field types are likely to be copied as well, but without guarantees.
@@ -48,7 +48,7 @@ This plugin contains code form other GPLv2 projects, credits go to:
  - https://wordpress.org/plugins/acf-flexible-layouts-manager
  - https://github.com/magicstickuk/Flexible-Content-Duplication
 
-"ACF-extended" has similar feature, but it didn't work on any of 20 sites I tested, probably because of the way how the flexible container is integrated into the project.
+"ACF-extended" has similar feature, but it didn't work on any of 20 sites I tested, probably because of the way how the flexible container is integrated into the projects.
 So I created a solution that works for me and shared publicly with everyone with the same problem.
 
 

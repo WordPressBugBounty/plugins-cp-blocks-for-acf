@@ -271,7 +271,7 @@
                 // parse
                 var data = CpBlocksForACF.replaceDomain(JSON.parse(paste));
                 var source = data.source;
-                var $html = $(data.layouts);
+                var $html = CpBlocksForACF.sanitizeLayouts(data.layouts);
                 var $html_layouts = $html.closest('[data-layout]');
                 if (!$html_layouts.length) return alert('No layouts data available');
 
@@ -373,6 +373,58 @@
             if (!domain || !data.layouts) return data;
             data.layouts = data.layouts.replaceAll(domain, window.location.origin);
             return data;
+        },
+
+
+        // parse pasted HTML in an inert document (no scripts or event handlers are run there),
+        // strip everything that could execute code and return the top-level elements as jQuery collection
+        sanitizeLayouts(html) {
+            if (typeof html !== 'string') {
+                throw new Error('Invalid layouts data');
+            }
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            CpBlocksForACF.sanitizeNode(doc.body);
+            // pass nodes (not re-serialized string) to avoid re-parsing differences
+            return $(Array.from(doc.body.children));
+        },
+
+
+        // remove dangerous elements and attributes from given node and all its descendants
+        sanitizeNode(root) {
+            const blockedTags = [
+                'script', 'iframe', 'frame', 'frameset', 'object', 'embed', 'applet', 'base', 'meta', 'link',
+                'style', 'template', 'noscript', 'animate', 'set', 'animatemotion', 'animatetransform',
+            ];
+            const urlAttrs = [
+                'href', 'src', 'action', 'xlink:href', 'data', 'poster', 'background', 'lowsrc', 'dynsrc',
+                'codebase', 'cite', 'longdesc', 'usemap', 'manifest',
+            ];
+            Array.from(root.querySelectorAll('*')).forEach(function(el) {
+                const tag = el.localName.toLowerCase();
+                if (tag === 'script' && /^text[-\/]html$/i.test(el.getAttribute('type') || '')) {
+                    // ACF keeps templates of nested flexible content in non-executable <script type="text-html">,
+                    // its content will be rendered later, so sanitize it too
+                    const inner = new DOMParser().parseFromString(el.textContent, 'text/html');
+                    CpBlocksForACF.sanitizeNode(inner.body);
+                    el.textContent = inner.body.innerHTML;
+                } else if (blockedTags.includes(tag)) {
+                    el.remove();
+                    return;
+                } else if (tag === 'form') {
+                    el.replaceWith(...el.childNodes); // keep content, drop form itself
+                    return;
+                }
+                Array.from(el.attributes).forEach(function(attr) {
+                    const name = attr.name.toLowerCase();
+                    const value = attr.value.replace(/[\u0000- \u007f- ]+/g, '').toLowerCase();
+                    const isDangerousUrl = urlAttrs.includes(name)
+                        && /^(javascript|vbscript|data):/.test(value)
+                        && !/^data:image\/(png|gif|jpe?g|webp|avif);/.test(value);
+                    if (name.startsWith('on') || name === 'srcdoc' || name === 'formaction' || isDangerousUrl) {
+                        el.removeAttribute(attr.name);
+                    }
+                });
+            });
         },
 
 

@@ -2,7 +2,7 @@
 /*
 Plugin Name: Copy/Paste FlexContent Blocks for ACF
 Description: Feature for ACF that allows copy-paste flexible blocks.
-Version:     0.4.2
+Version:     0.4.3
 Author:      Miroslav Curcic
 Author URI:  https://profiles.wordpress.org/tekod
 Text Domain: cp-blocks-for-acf
@@ -26,7 +26,7 @@ if (version_compare(PHP_VERSION, '7.0') < 0) {
 // prepare plugin constants
 define('CPBLOCKSFORACF_PLUGINBASENAME', plugin_basename(__FILE__));
 define('CPBLOCKSFORACF_DIR', __DIR__);
-define('CPBLOCKSFORACF_VERSION', '0.4.2'); // plugin version
+define('CPBLOCKSFORACF_VERSION', '0.4.3'); // plugin version
 
 // run plugin
 require_once __DIR__ . '/src/Bootstrap.php';
